@@ -35,7 +35,7 @@ echo doctype('html5')."\n"
 <meta name="Description" content="<?=htmlspecialchars(strip_tags($description))?>" />
 <? endif ?>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<? if (!$book->display_in_index || $is_new): ?>
+<? if (!$book->display_in_index || $is_new || !empty($version_datetime)): ?>
 <meta name="robots" content="noindex, nofollow">
 <? endif ?>
 <? if (!empty($view)): ?>
@@ -80,7 +80,6 @@ echo $js."\n";
 echo '</script>'."\n";
 endif;
 ?>
-
 </head>
 <body<?=(!empty($background))?' style="background-image:url('.str_replace(' ','%20',abs_url($background,$base_uri)).');"':''?>>
 

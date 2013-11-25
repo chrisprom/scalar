@@ -4,8 +4,20 @@ Scalar Installation Instructions
 
 Scalar is a PHP and MySQL application built with CodeIgniter.
  
-* Note that mod_rewrite (.htaccess) must be enabled in Apache config.
-* Scalar creates new folders and writes files in the Scalar root folder. Please make sure that the root folder is writable by the web server and PHP.
+*** 
+An important note on .htaccess:
+For Scalar to work properly, it is essential that mod_rewrite -- .htaccess -- be enabled in your Apache config.
+If .htaccess is not enabled, Scalar's URL rewriting will not operate; you'll know this is the case because clicking
+on links such as 'sign in' or 'register' will not take you to those pages (rather, the home page will reload).
+In addition, some FTP clients will interpret .htaccess as a hidden file and not copy them to the server by default.  
+There are a few .htaccess files included in the Scalar build, therefore please make sure that these files are copied.
+***
+
+***
+Also, on occassion we make changes to config files or the database schema, therefore please take a look at this page
+if you plan to update your local Scalar installation:
+https://github.com/anvc/scalar/wiki/Changes-to-config-files-over-time
+***
 
 1) 
 
@@ -21,12 +33,12 @@ system/application/config/database.php
 
 2)
 
-Add a new salt string, reCAPTCHA key (for you domain, http://www.google.com/recaptcha/whyrecaptcha), 
+Add a new SALT string, reCAPTCHA key (for you domain, http://www.google.com/recaptcha/whyrecaptcha), 
 registration key, SoundCloud key, and a few other keys:
 
 system/application/config/local_settings.php
 
-Add session encryption key ($config['encryption_key']) and cookie/sesion variable ($config['cookie_prefix'] = "";) at:
+Add session encryption key ($config['encryption_key']) and cookie/session variable ($config['cookie_prefix']) at:
 
 system/application/config/config.php
 
@@ -47,7 +59,7 @@ you might notice an error from Session.php involving num_rows().  In this case, 
 
 You can register your new account using the 'register' link.
 
-To make your user (after it is register) a "super admin", requires direct access to MySQL (e.g., phpMyAdmin). In the database table
+To make your user (after it is registered) a "super admin", requires direct access to MySQL (e.g., phpMyAdmin). In the database table
 "scalar_store_users" edit your user row then set the "is_super" bit to 1. After refreshing Scalar, you will have access to all
 Scalar books and additional admin tabs in the "Dashboard" area
 
@@ -61,8 +73,8 @@ Updates we've made to incorporated libraries, kept here for reference if they ne
 -------------------------------------------------------------------------------------------
 
 ARC2:
-1) ARC2_Resource.php->getProps(): commented out "if (!isset($this->index[$s])) $this->fetchData($s);"
-2) ARC2_RDFJSONSerializer.php->jsonEscape(): replaced "return trim(json_encode($v), '"');" with return substr(json_encode($v), 1, -1);
+1) ARC2_Resource.php->getProps(): comment out "if (!isset($this->index[$s])) $this->fetchData($s);"
+2) ARC2_RDFJSONSerializer.php->jsonEscape(): replace "return trim(json_encode($v), '"');" with return substr(json_encode($v), 1, -1);
 In the GitHub distro, #2 is corrected
 
 Froogaloop:

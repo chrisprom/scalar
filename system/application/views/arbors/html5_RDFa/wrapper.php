@@ -36,7 +36,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
 <meta name="description" content="<?=htmlspecialchars(strip_tags($description))?>" />
 <meta name="viewport" content="initial-scale=1" />
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<? if (!$book->display_in_index || $is_new): ?>
+<? if (!$book->display_in_index || $is_new || !empty($version_datetime)): ?>
 <meta name="robots" content="noindex, nofollow">
 <? endif ?>
 <? if (!empty($view)): ?>
@@ -67,6 +67,18 @@ echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
 <?=template_script_tag_relative(__FILE__, 'js/yepnope.css.js')."\n"?>
 <?=template_script_tag_relative(__FILE__, 'js/raphael-min.js')."\n"?>
 <? if (!empty($_scripts)) echo $_scripts?>
+<?
+if (!$mode && !empty($style)):
+echo '<style>'."\n";
+echo $style."\n";
+echo '</style>'."\n";
+endif;
+if (!$mode && !empty($js)):
+echo '<script>'."\n";
+echo $js."\n";
+echo '</script>'."\n";
+endif;
+?>
 </head>
 <body<?=(!empty($background))?' style="background-image:url('.str_replace(' ','%20',abs_url($background,$base_uri)).');"':''?>>
 
@@ -77,6 +89,9 @@ echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
 <article>
 
 	<header>
+<?
+		$this->load->view('arbors/html5_RDFa/noticebar');
+?>	
 		<h1 property="dcterms:title"><?=$page->versions[$page->version_index]->title?></h1>
 		<span resource="<?=rtrim($base_uri,'/')?>" typeof="scalar:Book">
 			<a href="<?=$base_uri?>index"><span id="book-title" property="dcterms:title"><?=$book->title?> </span></a>
@@ -89,7 +104,6 @@ echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
 		<span id="book-id" property=""><?=$book->book_id?></span>
 		<span property="dcterms:description"><?=$page->versions[$page->version_index]->description?></span>
 		<span property="art:url"><?=$page->versions[$page->version_index]->url?></span>
-		<span property="sioc:content"><?=nl2br($page->versions[$page->version_index]->content)?></span>
 		<span property="scalar:defaultView"><?=$page->versions[$page->version_index]->default_view?></span>
 		<a rel="dcterms:isVersionOf" href="<?=$base_uri.$page->slug?>"></a>
 <?
@@ -111,6 +125,8 @@ echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
 		endif;
 ?>		
 	</header>
+	
+	<span property="sioc:content"><?=str_replace("\r",'',str_replace("\n",'',nl2br($page->versions[$page->version_index]->content)))?></span>
 <?
 
 $has_references = $page->versions[$page->version_index]->has_references;

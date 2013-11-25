@@ -118,17 +118,17 @@ class Book extends MY_Controller {
 				if (!$page->is_live) $this->protect_book('Reader');
 				// Version being asked for
 				$version_num = (int) get_version($this->uri->uri_string());
-				$version_datetime = null;
+				$this->data['version_datetime'] = null;
 				if (!empty($version_num)) {
 					$version = $this->versions->get_by_version_num($page->content_id, $version_num);
-					if (!empty($version)) $version_datetime = $version->created; 
+					if (!empty($version)) $this->data['version_datetime'] = $version->created; 
 				}	
 				// Build nested array of page relationship
 				$settings = array(
 								 	'book'         => $this->data['book'], 
 									'content'      => $page, 
 									'base_uri'     => $this->data['base_uri'],
-									'versions'     => ((!empty($version_datetime))?$version_datetime:RDF_Object::VERSIONS_MOST_RECENT),
+									'versions'     => ((!empty($this->data['version_datetime']))?$this->data['version_datetime']:RDF_Object::VERSIONS_MOST_RECENT),
 									'ref'          => RDF_Object::REFERENCES_ALL,
 							  		'max_recurses' => $this->max_recursions	
 								 );
@@ -153,7 +153,6 @@ class Book extends MY_Controller {
 				$this->data['view'] = $this->vis_views[0];  // There's only one viz page (Javascript handles the specific viz types)
 			}
 			// View-specific method
-			// TODO: move this to methods.php
 			$method_name = $this->data['view'].'_view';
 			if (method_exists($this, $method_name)) $this->$method_name();	
 			// URI segment method
@@ -258,9 +257,17 @@ class Book extends MY_Controller {
 	
 	// Import
 	private function import() {
-		
+
 		if (!$this->login_is_book_admin()) $this->kickout();
 
+		// Force the honeydew melon; presently no other melon has editing features 
+		$this->data['melon'] = 'honeydew';
+		if (!file_exists(APPPATH.'views/melons/honeydew/config.php')) echo '<p>Warning: Honeydew theme does not exist, this page might render oddly.</p>';
+		include(APPPATH.'views/melons/honeydew/config.php');  // Hardcoding
+		$this->config->set_item('arbor', $config['arbor']);
+		$this->data['template'] = $this->template->config['active_template'];		
+		
+		// Set params
 		$archive = $this->uri->segment(3);
 		$this->data['hide_edit_bar'] = true;
 		
@@ -312,6 +319,13 @@ class Book extends MY_Controller {
 	// This uploads a file only and returns its URL; all other operations to create a media page are through the save API
 	private function upload() {
 
+		// Force the honeydew melon; presently no other melon has editing features 
+		$this->data['melon'] = 'honeydew';
+		if (!file_exists(APPPATH.'views/melons/honeydew/config.php')) echo '<p>Warning: Honeydew theme does not exist, this page might render oddly.</p>';
+		include(APPPATH.'views/melons/honeydew/config.php');  // Hardcoding
+		$this->config->set_item('arbor', $config['arbor']);
+		$this->data['template'] = $this->template->config['active_template'];		
+		
 		$action = (isset($_POST['action'])) ? strtolower($_POST['action']) : null;
 
 		if (!$this->login_is_book_admin()) {
@@ -494,6 +508,11 @@ class Book extends MY_Controller {
 	
 	private function edit_view() {
 
+		// Force the honeydew melon; presently no other melon has editing features 
+		$this->data['melon'] = 'honeydew';
+		if (!file_exists(APPPATH.'views/melons/honeydew/config.php')) echo '<p>Warning: Honeydew theme does not exist, this page might render oddly.</p>';
+		include(APPPATH.'views/melons/honeydew/config.php');  // Hardcoding
+		$this->config->set_item('arbor', $config['arbor']);
 		$this->data['template'] = $this->template->config['active_template'];
 		
 		// User
@@ -554,6 +573,7 @@ class Book extends MY_Controller {
 		if ($this->data['book']->template == 'cantaloupe') {
 			$this->data['page_views'] = array(
 				'plain' => 'Basic (This page\'s text and media interspersed)',
+				'image_header' => 'Image Header (This page\'s background image shown as a header)',
 				'splash' => 'Splash (This page\'s background image shown full screen w/ title at the bottom)',
 				'book_splash' => 'Book Splash (This page\'s background image shown full screen w/ book title and author at the bottom)',
 				'gallery' => 'Media Gallery (Media contained or tagged by this page shown in a gallery)',
